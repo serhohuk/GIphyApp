@@ -11,13 +11,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.serhohuk.giphyapp.R
 import com.serhohuk.giphyapp.data.utils.Resource
 import com.serhohuk.giphyapp.databinding.FragmentGifListBinding
 import com.serhohuk.giphyapp.domain.usecase.TrendingGifUseCase
 import com.serhohuk.giphyapp.presentation.adapters.GifListAdapter
+import com.serhohuk.giphyapp.presentation.adapters.GifLoadPagingSource
 import com.serhohuk.giphyapp.presentation.utils.AdapterType
+import com.serhohuk.giphyapp.presentation.utils.hideKeyboard
 import com.serhohuk.giphyapp.presentation.viewmodels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -52,7 +55,7 @@ class GifListFragment : Fragment() {
 
         setupAdapter()
         viewModel.trendingGifs()
-
+        binding.recView.requestFocus()
 
 
         binding.etSearch.editText?.addTextChangedListener(object : TextWatcher{
@@ -92,9 +95,28 @@ class GifListFragment : Fragment() {
        binding.recView.layoutManager = layoutManager
 
        adapter.setListener {
-           findNavController().navigate(R.id.action_gifListFragment_to_gifPreviewFragment)
+           val action = GifListFragmentDirections.actionGifListFragmentToGifPreviewFragment(it.first)
+           findNavController().navigate(action)
        }
+
    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (_binding!=null){
+            viewModel.recyclerState = binding.recView.layoutManager?.onSaveInstanceState()
+            viewModel.searchText = binding.etSearch.editText?.text.toString()
+        }
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (viewModel.recyclerState!=null && _binding!=null){
+            binding.recView.layoutManager?.onRestoreInstanceState(viewModel.recyclerState)
+            binding.etSearch.editText?.setText(viewModel.searchText)
+            binding.recView.requestFocus()
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

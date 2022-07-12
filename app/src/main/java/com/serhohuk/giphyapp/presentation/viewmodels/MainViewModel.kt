@@ -1,5 +1,7 @@
 package com.serhohuk.giphyapp.presentation.viewmodels
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -21,6 +23,9 @@ class MainViewModel(
 ) : ViewModel() {
 
     var gifsData : MutableStateFlow<PagingData<Gif>> = MutableStateFlow(PagingData.empty())
+    var position = 0
+    var recyclerState : Parcelable? = null
+    var searchText : String = ""
 
     fun searchGifs(query: String){
         gifsData.value = Pager(PagingConfig(26)){

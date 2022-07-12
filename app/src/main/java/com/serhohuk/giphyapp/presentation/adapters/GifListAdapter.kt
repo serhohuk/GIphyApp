@@ -22,14 +22,11 @@ class GifListAdapter(private val adapterType: AdapterType) : PagingDataAdapter<G
         (holder as GifItemViewHolder).bind(getItem(position)!!)
         (holder as GifItemViewHolder).setListener {
             listener?.let {
-                it(getItem(position)!!)
+                it(Pair(position,getItem(position)!!))
             }
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return super.getItemViewType(position)
-    }
 
     private object GifDiffItemCallback : DiffUtil.ItemCallback<Gif>(){
 
@@ -43,9 +40,9 @@ class GifListAdapter(private val adapterType: AdapterType) : PagingDataAdapter<G
 
     }
 
-    private var listener : ((Gif) -> Unit)? = null
+    private var listener : ((Pair<Int,Gif>) -> Unit)? = null
 
-    fun setListener(listener : (Gif)->Unit){
+    fun setListener(listener : (Pair<Int,Gif>)->Unit){
         this.listener = listener
     }
 

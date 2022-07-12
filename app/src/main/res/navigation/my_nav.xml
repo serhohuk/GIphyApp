@@ -18,5 +18,9 @@
         android:id="@+id/gifPreviewFragment"
         android:name="com.serhohuk.giphyapp.presentation.fragments.GifPreviewFragment"
         tools:layout="@layout/fragment_gif_preview"
-        android:label="GifPreviewFragment" />
+        android:label="GifPreviewFragment" >
+        <argument
+            android:name="position"
+            android:defaultValue="-1" />
+    </fragment>
 </navigation>
