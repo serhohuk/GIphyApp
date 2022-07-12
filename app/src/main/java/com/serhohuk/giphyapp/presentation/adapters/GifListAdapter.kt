@@ -8,15 +8,27 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.serhohuk.giphyapp.R
 import com.serhohuk.giphyapp.domain.models.Gif
+import com.serhohuk.giphyapp.presentation.utils.AdapterType
 
-class GifListAdapter : PagingDataAdapter<Gif,RecyclerView.ViewHolder>(GifDiffItemCallback) {
+class GifListAdapter(private val adapterType: AdapterType) : PagingDataAdapter<Gif,RecyclerView.ViewHolder>(GifDiffItemCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return GifItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_gif,parent,false))
+        return if (adapterType == AdapterType.LIST_ADAPTER){
+            GifItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_gif,parent,false))
+        } else GifItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_gif_full,parent,false))
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as GifItemViewHolder).bind(getItem(position)!!)
+        (holder as GifItemViewHolder).setListener {
+            listener?.let {
+                it(getItem(position)!!)
+            }
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return super.getItemViewType(position)
     }
 
     private object GifDiffItemCallback : DiffUtil.ItemCallback<Gif>(){
@@ -29,6 +41,12 @@ class GifListAdapter : PagingDataAdapter<Gif,RecyclerView.ViewHolder>(GifDiffIte
             return oldItem == newItem
         }
 
+    }
+
+    private var listener : ((Gif) -> Unit)? = null
+
+    fun setListener(listener : (Gif)->Unit){
+        this.listener = listener
     }
 
 }

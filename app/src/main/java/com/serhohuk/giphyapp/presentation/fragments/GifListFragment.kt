@@ -9,12 +9,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.serhohuk.giphyapp.R
 import com.serhohuk.giphyapp.data.utils.Resource
 import com.serhohuk.giphyapp.databinding.FragmentGifListBinding
 import com.serhohuk.giphyapp.domain.usecase.TrendingGifUseCase
 import com.serhohuk.giphyapp.presentation.adapters.GifListAdapter
+import com.serhohuk.giphyapp.presentation.utils.AdapterType
 import com.serhohuk.giphyapp.presentation.viewmodels.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -82,11 +85,15 @@ class GifListFragment : Fragment() {
 
 
    fun setupAdapter(){
-       adapter = GifListAdapter()
+       adapter = GifListAdapter(AdapterType.LIST_ADAPTER)
        binding.recView.adapter = adapter
        val layoutManager = StaggeredGridLayoutManager( 2,GridLayoutManager.VERTICAL)
        layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
        binding.recView.layoutManager = layoutManager
+
+       adapter.setListener {
+           findNavController().navigate(R.id.action_gifListFragment_to_gifPreviewFragment)
+       }
    }
 
     override fun onDestroyView() {

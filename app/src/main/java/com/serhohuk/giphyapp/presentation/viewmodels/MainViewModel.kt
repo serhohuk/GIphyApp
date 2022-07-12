@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.serhohuk.giphyapp.data.utils.Resource
 import com.serhohuk.giphyapp.domain.models.Gif
 import com.serhohuk.giphyapp.domain.models.GifData
@@ -24,13 +25,13 @@ class MainViewModel(
     fun searchGifs(query: String){
         gifsData.value = Pager(PagingConfig(26)){
             GifLoadPagingSource(trendingGifUseCase,searchGifsUseCase,query)
-        }.flow.stateIn(viewModelScope, SharingStarted.Eagerly, PagingData.empty()).value
+        }.flow.cachedIn(viewModelScope).stateIn(viewModelScope, SharingStarted.Eagerly, PagingData.empty()).value
     }
 
     fun trendingGifs(){
         gifsData.value = Pager(PagingConfig(26)){
             GifLoadPagingSource(trendingGifUseCase,searchGifsUseCase,null)
-        }.flow.stateIn(viewModelScope, SharingStarted.Eagerly, PagingData.empty()).value
+        }.flow.cachedIn(viewModelScope).stateIn(viewModelScope, SharingStarted.Eagerly, PagingData.empty()).value
     }
 
 }
