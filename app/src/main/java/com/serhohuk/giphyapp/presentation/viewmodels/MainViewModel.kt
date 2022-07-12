@@ -2,12 +2,16 @@ package com.serhohuk.giphyapp.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.serhohuk.giphyapp.data.utils.Resource
+import com.serhohuk.giphyapp.domain.models.Gif
 import com.serhohuk.giphyapp.domain.models.GifData
 import com.serhohuk.giphyapp.domain.usecase.SearchGifsUseCase
 import com.serhohuk.giphyapp.domain.usecase.TrendingGifUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.serhohuk.giphyapp.presentation.adapters.GifLoadPagingSource
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -15,22 +19,18 @@ class MainViewModel(
     private val searchGifsUseCase: SearchGifsUseCase
 ) : ViewModel() {
 
-    val LIMIT = 26
-    private val gifsFlow : MutableStateFlow<Resource<GifData>> = MutableStateFlow(Resource.Empty())
-    val gifsData = gifsFlow.asStateFlow()
+    var gifsData : MutableStateFlow<PagingData<Gif>> = MutableStateFlow(PagingData.empty())
 
-    fun getTrendingGif(offset : Int){
-        gifsFlow.value = Resource.Loading()
-        viewModelScope.launch {
-            gifsFlow.value = trendingGifUseCase.execute(LIMIT, offset)
-        }
+    fun searchGifs(query: String){
+        gifsData.value = Pager(PagingConfig(26)){
+            GifLoadPagingSource(trendingGifUseCase,searchGifsUseCase,query)
+        }.flow.stateIn(viewModelScope, SharingStarted.Eagerly, PagingData.empty()).value
     }
 
-    fun getSearchGif(query : String, offset: Int){
-        gifsFlow.value = Resource.Loading()
-        viewModelScope.launch {
-            gifsFlow.value = searchGifsUseCase.execute(query, LIMIT, offset)
-        }
+    fun trendingGifs(){
+        gifsData.value = Pager(PagingConfig(26)){
+            GifLoadPagingSource(trendingGifUseCase,searchGifsUseCase,null)
+        }.flow.stateIn(viewModelScope, SharingStarted.Eagerly, PagingData.empty()).value
     }
 
 }

@@ -22,6 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class GifListFragment : Fragment() {
@@ -29,9 +30,8 @@ class GifListFragment : Fragment() {
     private var _binding : FragmentGifListBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel : MainViewModel by viewModel()
+    private val viewModel : MainViewModel by sharedViewModel()
     private lateinit var adapter: GifListAdapter
-    private var offset = 0
     private var jobSearch : Job? = null
 
     override fun onCreateView(
@@ -48,8 +48,7 @@ class GifListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapter()
-        viewModel.getTrendingGif(offset)
-
+        viewModel.trendingGifs()
 
 
 
@@ -68,28 +67,16 @@ class GifListFragment : Fragment() {
                 if (text.isNotEmpty()){
                     jobSearch = lifecycleScope.launch {
                         delay(500)
-                        viewModel.getSearchGif(text,offset)
+                        viewModel.searchGifs(text)
                     }
                 } else {
-                    viewModel.getTrendingGif(offset)
+                    viewModel.trendingGifs()
                 }
             }
         })
 
         lifecycleScope.launchWhenCreated {
-            viewModel.gifsData.collectLatest {
-                when(it){
-                    is Resource.Success ->{
-                        adapter.listDiffer.submitList(it.data!!.list)
-                    }
-                    is Resource.Loading -> {
-
-                    }
-                    is Resource.Error ->{
-                        Toast.makeText(requireContext(), it.error, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
+            viewModel.gifsData.collectLatest(adapter::submitData)
         }
     }
 

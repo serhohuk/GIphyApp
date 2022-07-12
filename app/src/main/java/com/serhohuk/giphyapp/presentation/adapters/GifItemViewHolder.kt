@@ -13,6 +13,7 @@ class GifItemViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(gif : Gif){
         Glide.with(image).asGif().load(gif.images!!.downsized!!.url)
+            .placeholder(R.drawable.placeholder_loading)
             .into(image)
     }
 
