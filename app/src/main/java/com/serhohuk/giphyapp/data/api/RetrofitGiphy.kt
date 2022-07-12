@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitGiphy {
 
-    private const val GIPHY_BASE_URL = "https://api.giphy.com/v1/"
+    private const val GIPHY_BASE_URL = "https://api.giphy.com/v1/gifs/"
     const val API_KEY = "DqtG6vJauVhv8HSFtBvz3qdeMeFFUqEu"
 
     private val retrofit by lazy {
